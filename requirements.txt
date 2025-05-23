@@ -17,3 +17,4 @@ beautifulsoup4==4.12.3
 pydantic==2.10.4
 nbstripout==0.8.1
 nbconvert==7.16.4
+azure-storage-blob==12.16.0

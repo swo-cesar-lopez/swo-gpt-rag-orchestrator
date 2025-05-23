@@ -1,0 +1,147 @@
+[
+  {
+    "name": "AZURE_DB_ID",
+    "slotSetting": false,
+    "value": "dbgpt0-gf7fcpvj5kwhm"
+  },
+  {
+    "name": "AZURE_DB_NAME",
+    "slotSetting": false,
+    "value": "db0-gf7fcpvj5kwhm"
+  },
+  {
+    "name": "AZURE_DB_CONVERSATIONS_CONTAINER_NAME",
+    "slotSetting": false,
+    "value": "conversations"
+  },
+  {
+    "name": "AZURE_DB_DATASOURCES_CONTAINER_NAME",
+    "slotSetting": false,
+    "value": "datasources"
+  },
+  {
+    "name": "AZURE_KEY_VAULT_NAME",
+    "slotSetting": false,
+    "value": "kv0-gf7fcpvj5kwhm"
+  },
+  {
+    "name": "AZURE_SEARCH_SERVICE",
+    "slotSetting": false,
+    "value": "search0-gf7fcpvj5kwhm"
+  },
+  {
+    "name": "AZURE_SEARCH_INDEX",
+    "slotSetting": false,
+    "value": "ragindex"
+  },
+  {
+    "name": "AZURE_SEARCH_APPROACH",
+    "slotSetting": false,
+    "value": "hybrid"
+  },
+  {
+    "name": "AZURE_SEARCH_USE_SEMANTIC",
+    "slotSetting": false,
+    "value": "false"
+  },
+  {
+    "name": "AZURE_SEARCH_API_VERSION",
+    "slotSetting": false,
+    "value": "2024-07-01"
+  },
+  {
+    "name": "AZURE_OPENAI_RESOURCE",
+    "slotSetting": false,
+    "value": "oai0-gf7fcpvj5kwhm"
+  },
+  {
+    "name": "AZURE_OPENAI_CHATGPT_MODEL",
+    "slotSetting": false,
+    "value": "gpt-4o"
+  },
+  {
+    "name": "AZURE_OPENAI_CHATGPT_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "chat"
+  },
+  {
+    "name": "AZURE_OPENAI_API_VERSION",
+    "slotSetting": false,
+    "value": "2024-10-21"
+  },
+  {
+    "name": "AZURE_OPENAI_EMBEDDING_MODEL",
+    "slotSetting": false,
+    "value": "text-embedding-3-large"
+  },
+  {
+    "name": "AZURE_OPENAI_EMBEDDING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "text-embedding"
+  },
+  {
+    "name": "AZURE_EMBEDDINGS_VECTOR_SIZE",
+    "slotSetting": false,
+    "value": "3072"
+  },
+  {
+    "name": "ORCHESTRATOR_MESSAGES_LANGUAGE",
+    "slotSetting": false,
+    "value": "en"
+  },
+  {
+    "name": "ENABLE_ORYX_BUILD",
+    "slotSetting": false,
+    "value": "true"
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "true"
+  },
+  {
+    "name": "LOGLEVEL",
+    "slotSetting": false,
+    "value": "INFO"
+  },
+  {
+    "name": "PYTHON_ENABLE_INIT_INDEXING",
+    "slotSetting": false,
+    "value": "1"
+  },
+  {
+    "name": "PYTHON_ISOLATE_WORKER_DEPENDENCIES",
+    "slotSetting": false,
+    "value": "1"
+  },
+  {
+    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "slotSetting": false,
+    "value": "InstrumentationKey=d481b592-83f2-4361-b408-dcbddde62ff1;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus2.livediagnostics.monitor.azure.com/;ApplicationId=5ee541fc-b012-40b6-9be8-f8fde971a0d6"
+  },
+  {
+    "name": "AzureWebJobsStorage__accountName",
+    "slotSetting": false,
+    "value": "strag0gf7fcpvj5kwhmorc"
+  },
+  {
+    "name": "AzureWebJobsStorage__credential",
+    "slotSetting": false,
+    "value": "managedidentity"
+  },
+  {
+    "name": "AZURE_KEY_VAULT_ENDPOINT",
+    "slotSetting": false,
+    "value": "https://kv0-gf7fcpvj5kwhm.vault.azure.net/"
+  },
+  {
+    "name": "FUNCTIONS_WORKER_RUNTIME",
+    "slotSetting": false,
+    "value": "python"
+  },
+  {
+    "name": "FUNCTIONS_EXTENSION_VERSION",
+    "slotSetting": false,
+    "value": "~4"
+  }
+]

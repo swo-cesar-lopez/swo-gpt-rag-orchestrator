@@ -393,6 +393,14 @@ async def get_next_resource(model):
     if not AZURE_OPENAI_LOAD_BALANCING or model == AZURE_OPENAI_EMBEDDING_MODEL:
         return resources[0]
     else:
+
+        if True:
+            # Modo simulación para pruebas locales
+            logging.info(f"[util__module] get_next_resource: Running in local mode, returning first resource directly.")
+            return resources[0]
+
+
+
         start_time = time.time()
         async with ChainedTokenCredential( ManagedIdentityCredential(), AzureCliCredential()) as credential:
             async with AsyncCosmosClient(AZURE_DB_URI, credential) as db_client:
