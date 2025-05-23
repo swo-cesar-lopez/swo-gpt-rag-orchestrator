@@ -87,6 +87,7 @@ class FallbackHandler:
             if score > 0:
                 area_scores.append((area, score))
                 logger.debug(f"Area {area.area_name} matched with score {score}")
+                logger.debug(f"Matched keywords: {[k for k in area.keywords if k.lower() in query_lower]}")
         
         # Return the area with the highest score, or None if no matches
         if area_scores:

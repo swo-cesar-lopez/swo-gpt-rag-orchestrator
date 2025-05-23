@@ -274,10 +274,14 @@ async def get_answer(history, security_ids,conversation_id):
 
                 # Check if we have relevant sources
                 has_relevant_sources = bool(sources.strip())
+                logging.debug(f"[code_orchest] Search results: {sources[:200]}")  # Log first 200 chars of search results
+                logging.debug(f"[code_orchest] Has relevant sources: {has_relevant_sources}")
                 
                 if not has_relevant_sources and FALLBACK_ENABLED and fallback_handler:
+                    logging.debug(f"[code_orchest] Attempting to use fallback handler for query: {ask}")
                     # Use fallback handler to get area-specific contact information
                     fallback_response = fallback_handler.get_fallback_response(ask)
+                    logging.debug(f"[code_orchest] Fallback response: {fallback_response}")
                     answer = f"{fallback_response['message']}\n\nNombre: {fallback_response['contact_name']}\nEmail: {fallback_response['contact_email']}\nTeléfono: {fallback_response['contact_phone']}\n\nÁrea: {fallback_response['area_description']}"
                     answer_generated_by = "fallback_handler"
                 else:
@@ -344,12 +348,20 @@ async def get_answer(history, security_ids,conversation_id):
                 logging.info(f"[code_orchest] is it grounded? {grounded}.")  
                 if grounded.lower() == 'no':
                     logging.info(f"[code_orchest] ungrounded answer: {answer}")
-                    function_result = await call_semantic_function(kernel, conversationPlugin["NotInSourcesAnswer"], arguments)
-                    prompt_tokens += get_usage_tokens(function_result, 'prompt')
-                    completion_tokens += get_usage_tokens(function_result, 'completion')            
-                    answer =  str(function_result)
-                    answer_dict['gpt_groundedness'] = 1
-                    answer_generated_by = "gpt_groundedness_check"
+                    if FALLBACK_ENABLED and fallback_handler:
+                        logging.debug(f"[code_orchest] Attempting to use fallback handler for ungrounded answer")
+                        # Use fallback handler to get area-specific contact information
+                        fallback_response = fallback_handler.get_fallback_response(ask)
+                        logging.debug(f"[code_orchest] Fallback response: {fallback_response}")
+                        answer = f"{fallback_response['message']}\n\nNombre: {fallback_response['contact_name']}\nEmail: {fallback_response['contact_email']}\nTeléfono: {fallback_response['contact_phone']}\n\nÁrea: {fallback_response['area_description']}"
+                        answer_generated_by = "fallback_handler"
+                    else:
+                        function_result = await call_semantic_function(kernel, conversationPlugin["NotInSourcesAnswer"], arguments)
+                        prompt_tokens += get_usage_tokens(function_result, 'prompt')
+                        completion_tokens += get_usage_tokens(function_result, 'completion')            
+                        answer =  str(function_result)
+                        answer_dict['gpt_groundedness'] = 1
+                        answer_generated_by = "gpt_groundedness_check"
                     bypass_nxt_steps = True
                 else:
                     answer_dict['gpt_groundedness'] = 5
