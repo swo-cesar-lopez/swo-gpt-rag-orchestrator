@@ -29,7 +29,7 @@ ENV/
 
 # IDE
 .idea/
-.vscode/
+
 *.swp
 *.swo
 .DS_Store
@@ -72,3 +72,5 @@ local.settings.json
 # Azure Functions
 bin/
 obj/ 
+.python_packages
+local.settings.development.json

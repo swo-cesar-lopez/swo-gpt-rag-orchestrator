@@ -6,6 +6,7 @@ import semantic_kernel as sk
 import time
 from orc.plugins.Conversation.Triage.wrapper import triage
 from orc.plugins.ResponsibleAI.wrapper import fairness
+from orc.plugins.fallback_handler import FallbackHandler
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.functions import KernelPlugin
 from shared.util import call_semantic_function, get_chat_history_as_messages, get_message, get_last_messages,get_possitive_int_or_default
@@ -14,11 +15,17 @@ import asyncio
 import xml.sax.saxutils as saxutils
 
 # logging level
-
 logging.getLogger('azure').setLevel(logging.WARNING)
-LOGLEVEL = os.environ.get('LOGLEVEL', 'debug').upper()
-logging.basicConfig(level=LOGLEVEL)
+LOGLEVEL = os.environ.get('LOGLEVEL', 'DEBUG').upper()
+logging.basicConfig(
+    level=LOGLEVEL,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 myLogger = logging.getLogger(__name__)
+
+# Enable debug logging for fallback handler
+logging.getLogger('orc.plugins.fallback_handler').setLevel(logging.DEBUG)
 
 # Env Variables
 
@@ -51,6 +58,12 @@ APIM_ENABLED = os.environ.get("APIM_ENABLED") or "false"
 APIM_ENABLED = True if APIM_ENABLED.lower() == "true" else False
 if SECURITY_HUB_CHECK:
     SECURITY_HUB_THRESHOLDS=[get_possitive_int_or_default(os.environ.get("SECURITY_HUB_HATE_THRESHHOLD"), 0),get_possitive_int_or_default(os.environ.get("SECURITY_HUB_SELFHARM_THRESHHOLD"), 0),get_possitive_int_or_default(os.environ.get("SECURITY_HUB_SEXUAL_THRESHHOLD"), 0),get_possitive_int_or_default(os.environ.get("SECURITY_HUB_VIOLENCE_THRESHHOLD"), 0)]
+FALLBACK_ENABLED = os.environ.get("FALLBACK_ENABLED") or "true"
+FALLBACK_ENABLED = True if FALLBACK_ENABLED.lower() == "true" else False
+FALLBACK_STORAGE_ACCOUNT_NAME = os.environ.get("FALLBACK_STORAGE_ACCOUNT_NAME")
+FALLBACK_STORAGE_CONNECTION_STRING = os.environ.get("FALLBACK_STORAGE_CONNECTION_STRING")
+FALLBACK_CONTAINER = os.environ.get("FALLBACK_CONTAINER") or "fallback-config"
+FALLBACK_BLOB = os.environ.get("FALLBACK_BLOB") or "areas.json"
 
 async def get_answer(history, security_ids,conversation_id):
 
@@ -103,6 +116,21 @@ async def get_answer(history, security_ids,conversation_id):
         securityPluginTask = asyncio.create_task(asyncio.to_thread(kernel.add_plugin, KernelPlugin.from_directory(parent_directory=PLUGINS_FOLDER,plugin_name="Security")))
     if(RESPONSIBLE_AI_CHECK):
         raiPluginTask = asyncio.create_task(asyncio.to_thread(kernel.add_plugin,KernelPlugin.from_directory(parent_directory=f"{PLUGINS_FOLDER}/ResponsibleAI",plugin_name="Semantic")))
+
+    # Initialize fallback handler if enabled
+    fallback_handler = None
+    if FALLBACK_ENABLED:
+        try:
+            if not FALLBACK_STORAGE_CONNECTION_STRING:
+                raise ValueError("FALLBACK_STORAGE_CONNECTION_STRING is required when FALLBACK_ENABLED is true")
+                
+            fallback_handler = FallbackHandler(
+                connection_string=FALLBACK_STORAGE_CONNECTION_STRING,
+                container_name=FALLBACK_CONTAINER,
+                blob_name=FALLBACK_BLOB
+            )
+        except Exception as e:
+            logging.error(f"[code_orchest] could not initialize fallback handler: {e}")
 
     #############################
     # GUARDRAILS (QUESTION)
@@ -215,7 +243,6 @@ async def get_answer(history, security_ids,conversation_id):
 
             # Handle question answering intent
             if set(intents).intersection({"follow_up", "question_answering"}):         
-    
                 search_query = triage_dict['search_query'] if triage_dict['search_query'] != '' else ask
                 search_sources= ""
                 bing_sources=""
@@ -239,25 +266,34 @@ async def get_answer(history, security_ids,conversation_id):
                     escaped_sources = escape_xml_characters(bing_function_result.value)
                     bing_sources=escaped_sources
                 
-                
                 if(RETRIEVAL_PRIORITY=="search"):
                     sources=search_sources+bing_sources
                 else:
                     sources=bing_sources+search_sources
                 arguments["sources"] = sources
-                # Generate the answer augmented by the retrieval
-                logging.info(f"[code_orchest] generating bot answer. ask: {ask}")
-                start_time = time.time()                                                          
-                arguments["history"] = json.dumps(messages[:-1], ensure_ascii=False) # update context with full history
-                function_result = await call_semantic_function(kernel, conversationPlugin["Answer"], arguments)
-                answer =  str(function_result)
-                conversation_plugin_answer = answer
-                answer_generated_by = "conversation_plugin_answer"
-                prompt_tokens += get_usage_tokens(function_result, 'prompt')
-                completion_tokens += get_usage_tokens(function_result, 'completion')
-                prompt = str(function_result.metadata['messages'][0])
-                response_time =  round(time.time() - start_time,2)              
-                logging.info(f"[code_orchest] finished generating bot answer. {response_time} seconds. {answer[:100]}.")
+
+                # Check if we have relevant sources
+                has_relevant_sources = bool(sources.strip())
+                
+                if not has_relevant_sources and FALLBACK_ENABLED and fallback_handler:
+                    # Use fallback handler to get area-specific contact information
+                    fallback_response = fallback_handler.get_fallback_response(ask)
+                    answer = f"{fallback_response['message']}\n\nNombre: {fallback_response['contact_name']}\nEmail: {fallback_response['contact_email']}\nTeléfono: {fallback_response['contact_phone']}\n\nÁrea: {fallback_response['area_description']}"
+                    answer_generated_by = "fallback_handler"
+                else:
+                    # Generate the answer augmented by the retrieval
+                    logging.info(f"[code_orchest] generating bot answer. ask: {ask}")
+                    start_time = time.time()
+                    arguments["history"] = json.dumps(messages[:-1], ensure_ascii=False) # update context with full history
+                    function_result = await call_semantic_function(kernel, conversationPlugin["Answer"], arguments)
+                    answer =  str(function_result)
+                    conversation_plugin_answer = answer
+                    answer_generated_by = "conversation_plugin_answer"
+                    prompt_tokens += get_usage_tokens(function_result, 'prompt')
+                    completion_tokens += get_usage_tokens(function_result, 'completion')
+                    prompt = str(function_result.metadata['messages'][0])
+                    response_time =  round(time.time() - start_time,2)              
+                    logging.info(f"[code_orchest] finished generating bot answer. {response_time} seconds. {answer[:100]}.")
 
             # Handle general intents
             elif set(intents).intersection({"about_bot", "off_topic"}):

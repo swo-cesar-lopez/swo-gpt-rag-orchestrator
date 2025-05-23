@@ -93,3 +93,62 @@ trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
+
+## Fallback System
+
+The orchestrator includes an intelligent fallback system that provides area-specific contact information when no relevant information is found in the RAG system. This system:
+
+1. Analyzes the user's query to determine the most relevant business area
+2. Provides contact information for the identified area
+3. Falls back to general administration contact if no specific area is identified
+
+### Configuration
+
+The fallback system uses a separate Azure Storage Account for its configuration. To set it up:
+
+1. Create a new Storage Account in Azure
+2. Create a container named `fallback-config` (or your preferred name)
+3. Upload the areas configuration JSON file as `areas.json`
+4. Configure the environment variables with your storage account details
+
+### Environment Variables
+
+- `FALLBACK_ENABLED`: Enable/disable the fallback system (default: true)
+- `FALLBACK_STORAGE_ACCOUNT_NAME`: Name of the Azure Storage Account for fallback configuration
+- `FALLBACK_STORAGE_CONNECTION_STRING`: Connection string for the fallback storage account
+- `FALLBACK_CONTAINER`: Azure Blob Storage container name (default: fallback-config)
+- `FALLBACK_BLOB`: Configuration file name (default: areas.json)
+
+### Configuration File Format
+
+```json
+{
+  "company_areas": [
+    {
+      "area_id": "hr",
+      "area_name": "Recursos Humanos",
+      "keywords": ["personal", "empleado", "licencia", "vacaciones", "beneficios", "nómina", "contratación"],
+      "contact": {
+        "name": "María González",
+        "email": "maria.gonzalez@oxfam.org",
+        "phone": "+1-555-0123"
+      },
+      "description": "Políticas de personal, beneficios y administración de empleados"
+    }
+  ],
+  "default_contact": {
+    "name": "Administración General",
+    "email": "admin@oxfam.org",
+    "phone": "+1-555-0000"
+  },
+  "last_updated": "2025-05-23T10:00:00Z"
+}
+```
+
+### How It Works
+
+1. When the RAG system finds no relevant information for a query
+2. The fallback system analyzes the query text
+3. Matches keywords against defined business areas
+4. Returns contact information for the most relevant area
+5. If no area matches, returns the default contact information

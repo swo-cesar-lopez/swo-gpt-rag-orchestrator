@@ -1,0 +1,65 @@
+{
+  "company_areas": [
+    {
+      "area_id": "hr",
+      "area_name": "Recursos Humanos",
+      "keywords": ["personal", "empleado", "licencia", "vacaciones", "beneficios", "nómina", "contratación"],
+      "contact": {
+        "name": "María González",
+        "email": "maria.gonzalez@oxfam.org",
+        "phone": "+1-555-0123"
+      },
+      "description": "Políticas de personal, beneficios y administración de empleados"
+    },
+    {
+      "area_id": "finance",
+      "area_name": "Finanzas",
+      "keywords": ["presupuesto", "factura", "pago", "reembolso", "firma", "contrato", "autorización"],
+      "contact": {
+        "name": "Carlos Rodríguez",
+        "email": "carlos.rodriguez@oxfam.org",
+        "phone": "+1-555-0456"
+      },
+      "description": "Políticas financieras, autorizaciones y procedimientos contables"
+    },
+    {
+      "area_id": "it",
+      "area_name": "Tecnología",
+      "keywords": ["sistema", "software", "hardware", "acceso", "contraseña", "tecnología", "equipo"],
+      "contact": {
+        "name": "Ana Martínez",
+        "email": "ana.martinez@oxfam.org",
+        "phone": "+1-555-0789"
+      },
+      "description": "Políticas de TI, acceso a sistemas y soporte técnico"
+    },
+    {
+      "area_id": "time_anomalies",
+      "area_name": "Gestión de Anomalías Temporales",
+      "keywords": ["paradoja", "viaje en el tiempo", "línea temporal", "anomalía", "cronología", "desfase", "realidad alterna"],
+      "contact": {
+        "name": "Dr. Elías Tempus",
+        "email": "elias.tempus@oxfam.org",
+        "phone": "+1-555-1999"
+      },
+      "description": "Supervisión y resolución de alteraciones cronológicas que afectan procesos operativos, recursos o existencia de empleados."
+    },
+    {
+      "area_id": "interdimensional_liaison",
+      "area_name": "Enlace Interdimensional",
+      "keywords": ["dimensión", "portal", "entidad", "universo paralelo", "realidad", "interfaz cósmica", "multiverso"],
+      "contact": {
+        "name": "Zara Q'inthar",
+        "email": "zara.qinthar@oxfam.org",
+        "phone": "+1-555-4040"
+      },
+      "description": "Coordinación de relaciones y protocolos con entidades de otras dimensiones para asegurar la coherencia interrealidad."
+    }
+  ],
+  "default_contact": {
+    "name": "Administración General",
+    "email": "admin@oxfam.org",
+    "phone": "+1-555-0000"
+  },
+  "last_updated": "2025-05-23T10:00:00Z"
+}
